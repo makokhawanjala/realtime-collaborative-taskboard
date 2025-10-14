@@ -1,0 +1,662 @@
+/* Reset and Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    /* Windows 11 Color Palette */
+    --accent-primary: #0067C0;
+    --accent-secondary: #005A9E;
+    --accent-light: #E6F2FF;
+    --success-color: #0F7B0F;
+    --warning-color: #F7630C;
+    --danger-color: #C42B1C;
+    --dark: #1E1E1E;
+    --white: #FFFFFF;
+    --gray-bg: #F3F3F3;
+    --gray-card: #FAFAFA;
+    --gray-border: #E5E5E5;
+    --gray-text: #605E5C;
+    --gray-text-light: #8A8886;
+    
+    /* Windows 11 Shadows */
+    --shadow-card: 0 0.3px 0.9px rgba(0, 0, 0, 0.07),
+                   0 1.6px 3.6px rgba(0, 0, 0, 0.04);
+    --shadow-hover: 0 3.2px 7.2px rgba(0, 0, 0, 0.13),
+                    0 0.6px 1.8px rgba(0, 0, 0, 0.11);
+    --shadow-modal: 0 25.6px 57.6px rgba(0, 0, 0, 0.22),
+                    0 4.8px 14.4px rgba(0, 0, 0, 0.18);
+    
+    /* Windows 11 Border Radius */
+    --radius-small: 4px;
+    --radius-medium: 6px;
+    --radius-large: 8px;
+    --radius-xlarge: 12px;
+}
+
+body {
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background: var(--gray-bg);
+    min-height: 100vh;
+    color: var(--dark);
+    line-height: 1.5;
+}
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+/* Header - Windows 11 Style */
+.header {
+    background: var(--white);
+    border-bottom: 1px solid var(--gray-border);
+    padding: 12px 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(60px);
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 48px;
+}
+
+.logo {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--dark);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.logo i {
+    color: var(--accent-primary);
+    font-size: 24px;
+}
+
+.header-info {
+    display: flex;
+    gap: 24px;
+    align-items: center;
+}
+
+.connection-status,
+.active-users {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--gray-text);
+    font-weight: 400;
+}
+
+.connection-status i {
+    font-size: 8px;
+}
+
+.connection-status.connected i {
+    color: var(--success-color);
+    animation: pulse 2s infinite;
+}
+
+.connection-status.disconnected i {
+    color: var(--danger-color);
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* Main Content */
+.main {
+    padding: 24px 0;
+}
+
+.board-header {
+    background: var(--white);
+    border-radius: var(--radius-large);
+    padding: 24px;
+    margin-bottom: 20px;
+    border: 1px solid var(--gray-border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.board-info h2 {
+    font-size: 24px;
+    color: var(--dark);
+    margin-bottom: 4px;
+    font-weight: 600;
+}
+
+.board-info p {
+    color: var(--gray-text);
+    font-size: 13px;
+}
+
+/* Buttons - Windows 11 Style */
+.btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: var(--radius-small);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+    min-height: 32px;
+}
+
+.btn-primary {
+    background: var(--accent-primary);
+    color: var(--white);
+}
+
+.btn-primary:hover {
+    background: var(--accent-secondary);
+}
+
+.btn-primary:active {
+    transform: scale(0.98);
+}
+
+.btn-secondary {
+    background: var(--gray-bg);
+    color: var(--dark);
+    border: 1px solid var(--gray-border);
+}
+
+.btn-secondary:hover {
+    background: var(--gray-card);
+    border-color: var(--gray-text-light);
+}
+
+.btn-danger {
+    background: var(--danger-color);
+    color: var(--white);
+}
+
+.btn-danger:hover {
+    background: #A52714;
+}
+
+.btn-small {
+    padding: 4px 12px;
+    font-size: 12px;
+    min-height: 24px;
+}
+
+/* Board Columns */
+.board-columns {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+}
+
+.column {
+    background: var(--white);
+    border-radius: var(--radius-large);
+    padding: 16px;
+    border: 1px solid var(--gray-border);
+    min-height: 500px;
+}
+
+.column-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--gray-border);
+}
+
+.column-title {
+    font-size: 14px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--dark);
+}
+
+.column-title i {
+    font-size: 8px;
+}
+
+.status-todo { color: var(--gray-text-light); }
+.status-in-progress { color: var(--warning-color); }
+.status-done { color: var(--success-color); }
+
+.task-count {
+    background: var(--gray-bg);
+    color: var(--gray-text);
+    font-size: 12px;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: var(--radius-xlarge);
+    min-width: 24px;
+    text-align: center;
+}
+
+.task-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* Task Card - Windows 11 Acrylic Style */
+.task-card {
+    background: var(--white);
+    border-radius: var(--radius-medium);
+    padding: 12px;
+    box-shadow: var(--shadow-card);
+    border: 1px solid var(--gray-border);
+    border-left: 3px solid var(--gray-border);
+    cursor: pointer;
+    transition: all 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.task-card:hover {
+    box-shadow: var(--shadow-hover);
+    transform: translateY(-1px);
+    border-color: var(--gray-text-light);
+}
+
+.task-card.priority-low { 
+    border-left-color: var(--gray-text-light); 
+}
+.task-card.priority-medium { 
+    border-left-color: var(--warning-color); 
+}
+.task-card.priority-high { 
+    border-left-color: #D83B01; 
+}
+.task-card.priority-urgent { 
+    border-left-color: var(--danger-color); 
+}
+
+.task-card.new-task {
+    animation: highlight 0.6s ease-out;
+}
+
+@keyframes highlight {
+    0% { background: var(--white); }
+    50% { background: var(--accent-light); }
+    100% { background: var(--white); }
+}
+
+.task-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 8px;
+}
+
+.task-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--dark);
+    flex: 1;
+    line-height: 1.4;
+}
+
+.task-actions {
+    display: flex;
+    gap: 4px;
+    opacity: 0;
+    transition: opacity 0.1s;
+}
+
+.task-card:hover .task-actions {
+    opacity: 1;
+}
+
+.task-action-btn {
+    background: transparent;
+    border: none;
+    color: var(--gray-text);
+    cursor: pointer;
+    padding: 4px;
+    border-radius: var(--radius-small);
+    transition: all 0.1s;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.task-action-btn:hover {
+    background: var(--gray-bg);
+    color: var(--dark);
+}
+
+.task-action-btn:active {
+    transform: scale(0.95);
+}
+
+.task-description {
+    color: var(--gray-text);
+    font-size: 13px;
+    line-height: 1.5;
+    margin-bottom: 12px;
+}
+
+.task-meta {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    font-size: 12px;
+    color: var(--gray-text-light);
+}
+
+.task-priority,
+.task-due-date {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.priority-badge {
+    padding: 2px 8px;
+    border-radius: var(--radius-xlarge);
+    font-weight: 500;
+    text-transform: uppercase;
+    font-size: 11px;
+}
+
+.priority-badge.low {
+    background: var(--gray-bg);
+    color: var(--gray-text);
+}
+
+.priority-badge.medium {
+    background: #FFF4CE;
+    color: #8A5700;
+}
+
+.priority-badge.high {
+    background: #FDEBDE;
+    color: #8E3A00;
+}
+
+.priority-badge.urgent {
+    background: #FDE7E9;
+    color: var(--danger-color);
+}
+
+/* Modal - Windows 11 Mica Style */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(4px);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.modal.active {
+    display: flex;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.modal-content {
+    background: var(--white);
+    border-radius: var(--radius-large);
+    width: 90%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: var(--shadow-modal);
+    border: 1px solid var(--gray-border);
+    animation: slideUp 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(32px) scale(0.96);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--gray-border);
+}
+
+.modal-header h3 {
+    font-size: 20px;
+    color: var(--dark);
+    font-weight: 600;
+}
+
+.modal-close {
+    background: transparent;
+    border: none;
+    color: var(--gray-text);
+    cursor: pointer;
+    font-size: 16px;
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-small);
+    transition: all 0.1s;
+    width: 32px;
+    height: 32px;
+}
+
+.modal-close:hover {
+    background: var(--gray-bg);
+    color: var(--dark);
+}
+
+.modal-close:active {
+    transform: scale(0.95);
+}
+
+/* Form */
+form {
+    padding: 24px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--dark);
+    margin-bottom: 8px;
+}
+
+input[type="text"],
+input[type="datetime-local"],
+textarea,
+select {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid var(--gray-border);
+    border-radius: var(--radius-small);
+    font-size: 14px;
+    font-family: inherit;
+    background: var(--white);
+    color: var(--dark);
+    transition: all 0.1s;
+}
+
+input:hover,
+textarea:hover,
+select:hover {
+    border-color: var(--gray-text-light);
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 1px var(--accent-primary);
+}
+
+textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.modal-footer {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    padding: 16px 24px;
+    border-top: 1px solid var(--gray-border);
+    background: var(--gray-card);
+}
+
+/* Toast Notification - Windows 11 Style */
+.toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--white);
+    color: var(--dark);
+    padding: 12px 16px;
+    border-radius: var(--radius-large);
+    box-shadow: var(--shadow-modal);
+    border: 1px solid var(--gray-border);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    opacity: 0;
+    transform: translateX(400px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 2000;
+    min-width: 300px;
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.toast i {
+    color: var(--success-color);
+    font-size: 20px;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 32px 16px;
+    color: var(--gray-text-light);
+}
+
+.empty-state i {
+    font-size: 48px;
+    margin-bottom: 12px;
+    opacity: 0.3;
+}
+
+.empty-state p {
+    font-size: 13px;
+}
+
+/* Scrollbar - Windows 11 Style */
+::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--gray-border);
+    border-radius: 6px;
+    border: 3px solid transparent;
+    background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--gray-text-light);
+    border: 3px solid transparent;
+    background-clip: content-box;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .board-columns {
+        grid-template-columns: 1fr;
+    }
+    
+    .column {
+        min-height: auto;
+    }
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 0 16px;
+    }
+    
+    .header-content {
+        flex-direction: column;
+        gap: 12px;
+        height: auto;
+        padding: 8px 0;
+    }
+    
+    .board-header {
+        flex-direction: column;
+        gap: 16px;
+        align-items: flex-start;
+        padding: 16px;
+    }
+    
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .modal-content {
+        width: 95%;
+        margin: 16px;
+    }
+}
