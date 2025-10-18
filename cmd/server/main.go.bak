@@ -1,0 +1,159 @@
+// cmd/server/main.go
+package main
+
+import (
+	"context"
+	"log"
+	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
+
+	"github.com/gin-gonic/gin"
+	"github.com/makokhawanjala/realtime-taskboard/internal/config"
+	httpHandler "github.com/makokhawanjala/realtime-taskboard/internal/handler/http"
+	"github.com/makokhawanjala/realtime-taskboard/internal/handler/websocket"
+	"github.com/makokhawanjala/realtime-taskboard/internal/middleware"
+	"github.com/makokhawanjala/realtime-taskboard/internal/repository/postgres"
+	"github.com/makokhawanjala/realtime-taskboard/internal/repository/redis"
+	"github.com/makokhawanjala/realtime-taskboard/internal/service"
+	"github.com/makokhawanjala/realtime-taskboard/pkg/database"
+)
+
+func main() {
+	// Load configuration
+	cfg, err := config.Load()
+	if err != nil {
+		log.Fatalf("Failed to load config: %v", err)
+	}
+
+	// Set Gin mode
+	gin.SetMode(cfg.Server.GinMode)
+
+	log.Println("🚀 Starting Real-Time TaskBoard Server...")
+
+	// Initialize PostgreSQL
+	db, err := database.NewPostgresDB(database.PostgresConfig{
+		Host:     cfg.Database.Host,
+		Port:     cfg.Database.Port,
+		User:     cfg.Database.User,
+		Password: cfg.Database.Password,
+		DBName:   cfg.Database.DBName,
+		SSLMode:  cfg.Database.SSLMode,
+	})
+	if err != nil {
+		log.Fatalf("Failed to connect to PostgreSQL: %v", err)
+	}
+	defer database.ClosePostgresDB(db)
+
+	// Run migrations
+	migrationRunner := postgres.NewMigrationRunner(db)
+	if err := migrationRunner.RunMigrations(); err != nil {
+		log.Fatalf("Failed to run migrations: %v", err)
+	}
+
+	// Initialize Redis
+	redisClient, err := database.NewRedisClient(database.RedisConfig{
+		Host:     cfg.Redis.Host,
+		Port:     cfg.Redis.Port,
+		Password: cfg.Redis.Password,
+		DB:       cfg.Redis.DB,
+	})
+	if err != nil {
+		log.Fatalf("Failed to connect to Redis: %v", err)
+	}
+	defer database.CloseRedisClient(redisClient)
+
+	// Initialize repositories
+	taskRepo := postgres.NewTaskRepository(db)
+	pubsubClient := redis.NewPubSubClient(redisClient)
+
+	// Initialize services
+	taskService := service.NewTaskService(taskRepo, pubsubClient)
+	wsService := service.NewWebSocketService(pubsubClient)
+	defer wsService.Close()
+
+	// Initialize WebSocket hub
+	hub := websocket.NewHub(wsService)
+	go hub.Run()
+
+	// Initialize handlers
+	taskHandler := httpHandler.NewTaskHandler(taskService)
+	wsHandler := websocket.NewHandler(hub)
+
+	// Setup Gin router
+	router := gin.New()
+
+	// Apply middleware
+	router.Use(middleware.Recovery())
+	router.Use(middleware.Logger())
+	router.Use(middleware.CORS(cfg.App.CORSOrigins))
+
+	// Health check endpoint
+	router.GET("/health", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{
+			"status": "healthy",
+			"timestamp": time.Now().Unix(),
+		})
+	})
+
+	// API routes
+	api := router.Group("/api")
+	{
+		// Task routes
+		api.POST("/tasks", taskHandler.CreateTask)
+		api.GET("/tasks", taskHandler.GetAllTasks)
+		api.GET("/tasks/:id", taskHandler.GetTask)
+		api.PUT("/tasks/:id", taskHandler.UpdateTask)
+		api.PATCH("/tasks/:id/position", taskHandler.UpdateTaskPosition)
+		api.DELETE("/tasks/:id", taskHandler.DeleteTask)
+
+		// Board-specific task routes
+		api.GET("/boards/:board_id/tasks", taskHandler.GetTasksByBoard)
+	}
+
+	// WebSocket routes
+	router.GET("/ws", wsHandler.HandleWebSocket)
+	router.GET("/ws/stats", wsHandler.HandleStats)
+
+	// Serve static files
+	router.Static("/static", "./web/static")
+	router.StaticFile("/", "./web/templates/index.html")
+
+	// Create HTTP server
+	addr := cfg.GetServerAddr()
+	srv := &http.Server{
+		Addr:    addr,
+		Handler: router,
+	}
+
+	// Start server in a goroutine
+	go func() {
+		log.Printf("✅ Server started on %s", addr)
+		log.Printf("📡 WebSocket endpoint: ws://%s/ws?board_id=<BOARD_ID>", addr)
+		log.Printf("🌐 API endpoints: http://%s/api", addr)
+		log.Printf("💚 Health check: http://%s/health", addr)
+		
+		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			log.Fatalf("Failed to start server: %v", err)
+		}
+	}()
+
+	// Wait for interrupt signal to gracefully shutdown
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	<-quit
+
+	log.Println("🛑 Shutting down server...")
+
+	// Graceful shutdown with 5 second timeout
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	if err := srv.Shutdown(ctx); err != nil {
+		log.Fatalf("Server forced to shutdown: %v", err)
+	}
+
+	log.Println("✅ Server exited gracefully")
+}
