@@ -14,7 +14,7 @@ import (
 type WebSocketService struct {
 	pubsubClient *redis.PubSubClient
 	subscribers  map[string][]chan *domain.WebSocketEvent
-	mu           sync.RWMutex
+	mu           sync.RWMutex 
 	ctx          context.Context
 	cancel       context.CancelFunc
 }
